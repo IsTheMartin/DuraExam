@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="employeeList">http://dummy.restapiexample.com/api/v1/employees</string>
+    <string name="employee">http://dummy.restapiexample.com/api/v1/employee/</string>
+</resources>
