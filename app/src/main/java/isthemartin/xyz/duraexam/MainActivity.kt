@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -37,6 +38,9 @@ class MainActivity : AppCompatActivity(), CheckInternet.ConnectionReceiverListen
     private var employeesList: MutableList<Employee>? = null
     private val context: Context = this
 
+    private var backPressedTime: Long = 0
+    private var backToast: Toast? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -61,6 +65,21 @@ class MainActivity : AppCompatActivity(), CheckInternet.ConnectionReceiverListen
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(CheckInternet())
+    }
+
+    //    override fun onBackPressed() {
+//        if (backPressedTime + 2000 > System.currentTimeMillis()){
+//            backToast!!.cancel()
+//            super.onBackPressed()
+//        } else {
+//            backToast = Toast.makeText(baseContext, "Press back again", Toast.LENGTH_SHORT)
+//            backToast!!.show()
+//        }
+//    }
 
     private fun showNetworkMessage(isConnected: Boolean) {
         swipeRefresh!!.isEnabled = isConnected
@@ -89,7 +108,7 @@ class MainActivity : AppCompatActivity(), CheckInternet.ConnectionReceiverListen
                 employee -> supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.mainLayout, EmployeeFragment.newInstance(
-                    employee.id, ""
+                    employee.id, employee.name, employee.age, employee.salary
                 ), "employee")
                 .addToBackStack(null)
                 .commit()

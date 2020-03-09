@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -27,6 +28,8 @@ import org.json.JSONObject
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+private const val ARG_PARAM3 = "param3"
+private const val ARG_PARAM4 = "param4"
 
 /**
  * A simple [Fragment] subclass.
@@ -40,15 +43,23 @@ class EmployeeFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: Int? = null
     private var param2: String? = null
+    private var param3: Int? = null
+    private var param4: Double? = null
     private var listener: OnFragmentInteractionListener? = null
+
+    private var tvName: TextView? = null
+    private var tvAge: TextView? = null
+    private var tvSalary: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getInt(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            param3 = it.getInt(ARG_PARAM3)
+            param4 = it.getDouble(ARG_PARAM4)
         }
-        Toast.makeText(activity, param1.toString(), Toast.LENGTH_LONG).show()
+        //Toast.makeText(activity, param1.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onCreateView(
@@ -57,6 +68,10 @@ class EmployeeFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         var view: View? = inflater.inflate(R.layout.fragment_employee, container, false)
+        tvName = view!!.findViewById(R.id.tvName)
+        tvAge = view!!.findViewById(R.id.tvAge)
+        tvSalary = view!!.findViewById(R.id.tvSalary)
+        initializeDummyData()
         getDataFromServer()
         return view
     }
@@ -78,6 +93,14 @@ class EmployeeFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+
+
+    private fun initializeDummyData(){
+        tvName!!.text = param2
+        tvAge!!.text = param3.toString() + " years old"
+        tvSalary!!.text = "$ " + param4.toString()
     }
 
     private fun getDataFromServer() {
@@ -106,9 +129,9 @@ class EmployeeFragment : Fragment() {
 
     private fun parsingJsonToList(jArray: JSONArray) {
         var jObject: JSONObject = jArray.getJSONObject(0)
-        tvName.text = jObject["employee_name"].toString()
-        tvAge.text = jObject["employee_age"].toString() + " years old"
-        tvSalary.text = jObject["employee_salary"].toString()
+        tvName!!.text = jObject["employee_name"].toString()
+        tvAge!!.text = jObject["employee_age"].toString() + " years old"
+        tvSalary!!.text = "$ " + jObject["employee_salary"].toString()
     }
 
     /**
@@ -138,12 +161,15 @@ class EmployeeFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: Int, param2: String) =
+        fun newInstance(param1: Int, param2: String, param3: Int, param4: Double) =
             EmployeeFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
+                    putInt(ARG_PARAM3, param3)
+                    putDouble(ARG_PARAM4, param4)
                 }
             }
     }
 }
+
