@@ -1,6 +1,5 @@
 package isthemartin.xyz.duraexam.Classes
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -8,12 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import isthemartin.xyz.duraexam.Model.Employee
 import isthemartin.xyz.duraexam.R
 
-class EmployeesAdapter(private val employeesList: List<Employee>?, private val context: Context):
+class EmployeesAdapter(private val employeesList: List<Employee>?):
     RecyclerView.Adapter<EmployeesAdapter.EmployeeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmployeeViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        var item = inflater.inflate(R.layout.employee_item, parent,false)
         return EmployeeViewHolder(inflater, parent)
     }
 
@@ -35,7 +33,6 @@ class EmployeesAdapter(private val employeesList: List<Employee>?, private val c
 
         private var tvName: TextView? = null
         private var tvAge : TextView? = null
-        private var tvSalary: TextView? = null
 
         init {
             itemView.setOnClickListener{
@@ -44,13 +41,11 @@ class EmployeesAdapter(private val employeesList: List<Employee>?, private val c
 
             tvName = itemView.findViewById(R.id.tvName)
             tvAge = itemView.findViewById(R.id.tvAge)
-            tvSalary = itemView.findViewById(R.id.tvSalary)
         }
 
         fun bind(employee: Employee){
             tvName?.text = employee.name
             tvAge?.text = employee.age.toString() + " years old"
-            tvSalary?.text = employee.salary.toString()
         }
     }
 }

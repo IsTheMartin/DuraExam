@@ -7,24 +7,29 @@ import android.net.ConnectivityManager
 
 class CheckInternet: BroadcastReceiver() {
 
-    companion object {
-        var connectivityReceiverListener: ConnectivityReceiverListener? = null
+    override fun onReceive(context: Context, intent: Intent?) {
+        var isConnected = checkConnection(context)
+        if(connectionReceiverListener != null)
+            connectionReceiverListener!!.onNetworkConnectionChanged(isConnected)
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (connectivityReceiverListener != null) {
-            connectivityReceiverListener!!
-                .onNetworkConnectionChanged(isConnectedOrConnecting(context!!))
-        }
-    }
-
-    private fun isConnectedOrConnecting(context: Context): Boolean {
-        val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connMgr.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnectedOrConnecting
-    }
-
-    interface ConnectivityReceiverListener {
+    interface ConnectionReceiverListener{
         fun onNetworkConnectionChanged(isConnected: Boolean)
+    }
+
+    private fun checkConnection(context: Context) :Boolean{
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting)
+    }
+
+    companion object {
+        var connectionReceiverListener: ConnectionReceiverListener? = null
+        val isConnected: Boolean
+        get() {
+            val cm = MyApp.instance.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = cm.activeNetworkInfo
+            return (activeNetwork != null && activeNetwork.isConnectedOrConnecting)
+        }
     }
 }

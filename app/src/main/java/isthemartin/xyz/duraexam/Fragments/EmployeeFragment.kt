@@ -3,12 +3,25 @@ package isthemartin.xyz.duraexam.Fragments
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.BasicNetwork
+import com.android.volley.toolbox.DiskBasedCache
+import com.android.volley.toolbox.HurlStack
+import com.android.volley.toolbox.JsonObjectRequest
+import isthemartin.xyz.duraexam.Model.Employee
 
 import isthemartin.xyz.duraexam.R
+import kotlinx.android.synthetic.main.fragment_employee.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,16 +38,17 @@ private const val ARG_PARAM2 = "param2"
  */
 class EmployeeFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
+    private var param1: Int? = null
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
+            param1 = it.getInt(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        Toast.makeText(activity, param1.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onCreateView(
@@ -42,7 +56,9 @@ class EmployeeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_employee, container, false)
+        var view: View? = inflater.inflate(R.layout.fragment_employee, container, false)
+        getDataFromServer()
+        return view
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -62,6 +78,37 @@ class EmployeeFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    private fun getDataFromServer() {
+        val url = activity!!.resources.getString(R.string.employee) + param1.toString()
+
+        val cache = DiskBasedCache(activity!!.cacheDir, 1024 * 1024)
+        val network = BasicNetwork(HurlStack())
+
+        val requestQueue = RequestQueue(cache, network).apply {
+            start()
+        }
+
+        val request = JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            Response.Listener { response ->
+                parsingJsonToList(response.getJSONArray("data"))
+            },
+            Response.ErrorListener { error ->
+                Log.d("Error", error.message)
+            }
+        )
+        requestQueue.add(request)
+    }
+
+    private fun parsingJsonToList(jArray: JSONArray) {
+        var jObject: JSONObject = jArray.getJSONObject(0)
+        tvName.text = jObject["employee_name"].toString()
+        tvAge.text = jObject["employee_age"].toString() + " years old"
+        tvSalary.text = jObject["employee_salary"].toString()
     }
 
     /**
@@ -91,10 +138,10 @@ class EmployeeFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: Int, param2: String) =
             EmployeeFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
+                    putInt(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
                 }
             }
